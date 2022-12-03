@@ -210,3 +210,10 @@ def bad_request(request):
 
 def permission_denied(request):
         // Dict to pass to template, data could come from DB query values_for_template = {} return render(request,'403.html',values_for_template,status=403)
+
+## View Method Middleware
+
+For example, if you want to access certain data on all view methods, it’s easier to use a middleware class to make this data accessible across all requests. Just as if you want to enforce a security check on all responses, it’s easier to do so globally with a middleware class.
+Middlewares start between  request and view, view and response
+Request => Middleware => View
+View => Middleware => Response
