@@ -1,0 +1,13 @@
+{% extends './base.html' %} {% block content %}
+<form
+  action=""
+  method="post"
+  enctype="multipart/form-data"
+  class="mb-3 w-75 my-5 mx-auto shadow py-5 px-4"
+>
+  {% csrf_token %} {{form.as_p}}
+  <button class="btn btn-outline-primary" type="submit" id="button-addon2">
+    Submit
+  </button>
+</form>
+{% endblock%}

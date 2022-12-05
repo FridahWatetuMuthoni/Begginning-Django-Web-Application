@@ -1,4 +1,5 @@
 from pathlib import Path
+import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,7 +12,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&0!j%)kd)o36tdpe7v%(x@+4l+@3imd_@x)fe96fg)ib5k8x^('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if socket.gethostname().startswith('live'):
+    DJANGO_HOST = 'production'
+elif socket.gethostname().startswith('test'):
+    DJANGO_HOST = "testing"
+else:
+    DJANGO_HOST = "development"
+
+
+if DJANGO_HOST == "production":
+    DEBUG = False
+else:
+    DEBUG = True
+
 
 ALLOWED_HOSTS = []
 
@@ -113,9 +126,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if DJANGO_HOST == "production":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+STATIC_URL = '/static/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "static"

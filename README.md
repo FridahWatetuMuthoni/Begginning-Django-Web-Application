@@ -92,6 +92,26 @@ index => name(at the url (name=index))
 
 ## View Method Requests
 
+def home(request):
+    print(request.method)  # request method
+    print(request.META['REMOTE_ADDR'])  # the address
+    print(request.META['HTTP_COOKIE'])  # session id and csrf token
+    # current user {it can either be current user or anonymousUser}
+    print(request.user.username)
+    print(request.user.email)
+    # get values of a post request
+    if request.method == 'POST':
+        # gets the value of name and returns None is the value is not found
+        name = request.POST.get('name', default=None)
+    # getting parameters passed to the url using the get request
+    name_parameter = request.GET.get('name', None)
+    email_parameter = request.GET.get('email', None)
+    print(name_parameter, email_parameter)
+    # The render arguements:
+    #  required=> request, template
+    # optional=> context, Content-Type,status,template engine
+    return render(request, 'home.html')
+
 View Method Responses
 
 The render() method to generate view method responses you’ve used up to this point is actually a shortcut. You can see toward the top of Listing 2-21, the render() method is part of the django.shortcuts package.
@@ -217,3 +237,64 @@ For example, if you want to access certain data on all view methods, it’s easi
 Middlewares start between  request and view, view and response
 Request => Middleware => View
 View => Middleware => Response
+
+## Flash Messages
+
+They are used when users perform an action eg submit a form.It is usefull to tell them if the action was successfull or not. The flash messages require a django app, middleware and template context processor
+
+from django.contrib import messages
+
+messages.debug(request, 'The following SQL statements were executed: %s' % sqlqueries)
+messages.info(request, 'All items on this page have free shipping.')
+messages.success(request, 'Email sent successfully.')
+messages.warning(request, 'You will need to change your password in one week.')
+messages.error(request, 'We could not process your request at this time.')
+
+accessing flash messages
+{% if messages %}
+<ul class="messages">
+{% for message in messages %}
+<li>
+<div class="alert alert-{{message.level_tag}} role="alert">
+{{message.message}}
+</div>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+## Accessing the flash method in view
+
+from django.contrib import messages
+the_req_messages = messages.get_messages(request)
+for msg in the_req_messages:
+        do_something_with_the_flash_message(msg)
+
+## Class-Based Views
+
+class based views enable us to use inheritance, polymorphism, encapsulation,
+
+Alllows us to execute Create-Read-Update-Delete
+
+django.views.generic.CreateView
+django.views.generic.DetailView
+django.views.generic.UpdateView
+django.views.generic.DeleteView
+django.views.generic.ListView
+django.views.generic.FormView
+
+## Class-Based View Structure and Execution
+
+from django.views.generic import TemplateView
+
+class AboutIndex(TemplateView):
+        template_name='index.html'
+
+        def get_context_data(self, **kwargs):
+                **kwargs contains keyword context initialization values(if any)
+                call base implementation to get a context
+                context = super(AboutIndex,self).get_context_data(**kwargs)
+                pass data to the context
+                context['data']='custom data'
+
+## Django Forms

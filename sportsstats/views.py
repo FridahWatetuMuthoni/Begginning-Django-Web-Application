@@ -1,24 +1,53 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.views.generic import TemplateView
+from . import forms
+
 
 # Create your views here.
 
 
 def home(request):
-    print(request.method)  # request method
-    print(request.META['REMOTE_ADDR'])  # the address
-    print(request.META['HTTP_COOKIE'])  # session id and csrf token
-    # current user {it can either be current user or anonymousUser}
-    print(request.user.username)
-    print(request.user.email)
+    return render(request, 'home.html')
+
+
+def contact(request):
+    form = forms.ContactForm()
+
     # get values of a post request
     if request.method == 'POST':
-        # gets the value of name and returns None is the value is not found
-        name = request.POST.get('name', default=None)
-    # getting parameters passed to the url using the get request
-    name_parameter = request.GET.get('name', None)
-    email_parameter = request.GET.get('email', None)
-    print(name_parameter, email_parameter)
-    # The render arguements:
-    #  required=> request, template
-    # optional=> context, Content-Type,status,template engine
-    return render(request, 'home.html')
+        form = forms.ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.info(request, 'Submitted successfully')
+            return redirect('/')
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'contact.html', context)
+
+
+def sharingPage(request):
+    form = forms.SharingForm()
+    if request.method == "POST":
+        form = forms.SharingForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {
+        'form': form
+    }
+    return render(request, 'sharing.html', context)
+
+
+class AboutPage(TemplateView):
+    template_name = 'about.html'
+
+    def get_context_data(self, **kwargs):
+        # **kwargs contains keyword context initialization values(if any) call base implementation to get a context
+        context = super(AboutPage, self).get_context_data(**kwargs)
+        # pass data to the context
+        context['data'] = 'custom data'
+        return context
